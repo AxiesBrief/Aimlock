@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="https://pankaj112343.github.io/Esyaim1/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <title>🎯 HEAD LOCK PRO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
+        }
+        body {
+            background: transparent;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Fullscreen touch capture */
+        #magnet {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 2147483646;
+            pointer-events: auto;
+            background: transparent;
+            cursor: crosshair;
+        }
+
+        /* ===== CROSSHAIR – VISIBLE & AGGRESSIVE ===== */
+        #cross {
+            position: fixed;
+            pointer-events: none;
+            z-index: 2147483645;
+            transform: translate(-50%, -50%);
+            transition: transform 0.02s ease-out;
+            will-change: transform;
+            display: block !important;
+        }
+        #cross .ring {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 3px solid #0eff00;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6), inset 0 0 20px rgba(0, 255, 136, 0.2);
+            position: relative;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.10) 0%, transparent 70%);
+        }
+        #cross .dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #0eff00;
+            box-shadow: 0 0 18px #0eff00;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+        #cross .ring .label {
+            position: absolute;
+            top: -32px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #0eff00;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 2px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            white-space: nowrap;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+        #cross.locked .ring {
+            border-color: #ff8800;
+            box-shadow: 0 0 50px #ff8800, 0 0 80px rgba(255, 136, 0, 0.3);
+        }
+        #cross.locked .dot {
+            background: #ff8800;
+            box-shadow: 0 0 30px #ff8800;
+        }
+        #cross.locked .ring .label {
+            color: #ff8800;
+            border-color: #ff8800;
+            text-shadow: 0 0 20px rgba(255, 136, 0, 0.5);
+        }
+        #cross.snap .ring {
+            border-color: #00ff88;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.9), 0 0 80px rgba(0, 255, 136, 0.3);
+            animation: snapPulse 0.15s ease-out;
+        }
+        @keyframes snapPulse {
+            0% { transform: scale(1.4); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* ===== MAIN PANEL ===== */
+        #panel {
+            position: relative;
+            z-index: 2147483647;
+            width: 90%;
+            max-width: 520px;
+            background: rgba(10, 12, 20, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 32px;
+            padding: 28px 24px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            pointer-events: auto;
+            color: #fff;
+            transition: border-color 0.4s, box-shadow 0.4s;
+            max-height: 98vh;
+            overflow-y: auto;
+        }
+        #panel.active {
+            border-color: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 255, 136, 0.08);
+        }
+        #panel::-webkit-scrollbar { width: 4px; }
+        #panel::-webkit-scrollbar-track { background: transparent; }
+        #panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        /* ===== AD SLOTS ===== */
+        .ad-container {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 8px 4px;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50px;
+            pointer-events: auto;
+            transition: all 0.2s;
+        }
+        .ad-container:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .ad-container .ad-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        #bottom-ad {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 2147483647;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 6px 8px;
+            pointer-events: auto;
+            min-height: 55px;
+        }
+        #bottom-ad .ad-label {
+            position: absolute;
+            top: 2px;
+            right: 8px;
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ===== PANEL ELEMENTS ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 12px;
+        }
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .title .badge {
+            font-size: 10px;
+            font-weight: 600;
+            background: rgba(0, 255, 136, 0.15);
+            color: #0eff00;
+            padding: 2px 12px;
+            border-radius: 40px;
+            letter-spacing: 0.5px;
+        }
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 14px 4px 10px;
+            border-radius: 40px;
+            transition: all 0.3s;
+        }
+        .status-badge .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        .status-badge.on .dot {
+            background: #0eff00;
+            box-shadow: 0 0 12px #0eff00;
+        }
+        .status-badge.on {
+            color: #0eff00;
+            background: rgba(0, 255, 136, 0.08);
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 60px;
+            padding: 12px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .toggle-label {
+            font-size: 17px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+        }
+        .toggle-label .sub {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 1px;
+        }
+        .toggle {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 40px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+        }
+        .toggle.on {
+            background: rgba(0, 255, 136, 0.25);
+        }
+        .toggle .knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
+        }
+        .toggle.on .knob {
+            transform: translateX(28px);
+            background: #0eff00;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .meter-section {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .meter-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 4px;
+        }
+        .meter-header .val {
+            color: #0eff00;
+            font-weight: 600;
+        }
+        .meter-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        #recoil-fill {
+            width: 0%;
+            height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #00cc44, #0eff00);
+            transition: width 0.04s linear;
+            box-shadow: 0 0 12px rgba(0, 255, 0, 0.3);
+        }
+
+        /* ===== REFERRAL ===== */
+        .ref-section {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .ref-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        .ref-header .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .ref-header .arrow {
+            transition: transform 0.3s;
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .ref-header .arrow.open {
+            transform: rotate(180deg);
+        }
+        .ref-body {
+            margin-top: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .ref-body.open {
+            display: flex;
+        }
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+        .input-row input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 40px;
+            padding: 8px 14px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .input-row input:focus {
+            border-color: #0eff00;
+        }
+        .input-row input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+        .btn {
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 40px;
+            padding: 8px 16px;
+            color: #0eff00;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn:hover { background: rgba(0, 255, 136, 0.25); }
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .btn.secondary:hover { background: rgba(255, 255, 255, 0.08); }
+        .btn.gold {
+            background: rgba(255, 170, 0, 0.2);
+            border-color: #ffaa00;
+            color: #ffaa00;
+        }
+        .btn.gold:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .ref-link {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 40px;
+            padding: 6px 14px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            word-break: break-all;
+        }
+        .ref-link .copy-btn {
+            background: none;
+            border: none;
+            color: #0eff00;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+        }
+        .ref-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 60px;
+            overflow-y: auto;
+        }
+        .ref-tag {
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid rgba(0, 255, 136, 0.15);
+            border-radius: 30px;
+            padding: 2px 10px 2px 14px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ref-tag .remove {
+            cursor: pointer;
+            color: rgba(255, 100, 100, 0.6);
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 1;
+        }
+        .ref-tag .remove:hover { color: #ff4444; }
+        .progress-row {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .progress-row .bar-wrap {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            height: 6px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .progress-row .bar-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #0eff00, #ffaa00);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .claim-area {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 4px;
+        }
+        .claim-area .btn {
+            flex: 1;
+            text-align: center;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .info-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .info-steps {
+            font-size: 13px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .info-steps strong {
+            color: #fff;
+            font-weight: 500;
+        }
+        .info-steps .hl {
+            color: #0eff00;
+        }
+        .bg-note {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 4px 12px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            margin-top: 4px;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            padding-top: 14px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .vip-btn {
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 8px 18px;
+            border-radius: 60px;
+            transition: all 0.25s;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .vip-btn:active { transform: scale(0.95); }
+        .vip-btn:hover {
+            color: #0eff00;
+            background: rgba(0, 255, 136, 0.08);
+            border-color: rgba(0, 255, 136, 0.2);
+        }
+        .footer-hint {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.3px;
+        }
+
+        #proof-ticker {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #0eff00;
+            padding: 5px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            z-index: 2147483647;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+            backdrop-filter: blur(4px);
+            font-family: monospace;
+        }
+        #proof-ticker.show { opacity: 1; }
+
+        /* ===== VIP MODAL ===== */
+        #vip-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(8px);
+            z-index: 2147483647;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        #vip-modal.show { display: flex; }
+        #vip-card {
+            background: linear-gradient(160deg, #0a0a0a 0%, #1a1a1a 100%);
+            border: 2px solid #0eff00;
+            border-radius: 24px;
+            padding: 22px 18px;
+            max-width: 380px;
+            width: 100%;
+            max-height: 92vh;
+            overflow-y: auto;
+            box-shadow: 0 0 60px rgba(0, 255, 0, 0.3);
+            position: relative;
+        }
+        #vip-card h1 {
+            color: #0eff00;
+            font-size: 22px;
+            text-align: center;
+            margin-bottom: 6px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+        #vip-card .sub {
+            color: #88ff88;
+            text-align: center;
+            font-size: 12px;
+            margin-bottom: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        #vip-card .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            color: #888;
+            font-size: 26px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            line-height: 1;
+            padding: 4px 8px;
+        }
+        #vip-card .close-btn:active { color: #fff; }
+        .plan {
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid #333;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .plan:active { transform: scale(0.98); }
+        .plan.hot {
+            border-color: #0eff00;
+            background: rgba(0, 255, 0, 0.08);
+            box-shadow: 0 0 18px rgba(0, 255, 0, 0.2);
+        }
+        .plan .badge-hot {
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            background: linear-gradient(135deg, #00cc44, #0eff00);
+            color: #000;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 3px 10px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+        }
+        .plan-title {
+            color: #fff;
+            font-weight: 900;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .plan-price {
+            color: #0eff00;
+            font-weight: 900;
+            font-size: 20px;
+        }
+        .plan-feat {
+            color: #aaa;
+            font-size: 12px;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+        .plan-feat::before { content: "✓ "; color: #0eff00; font-weight: bold; }
+        .contact-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .contact-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            letter-spacing: 0.5px;
+            transition: transform 0.15s;
+        }
+        .contact-btn:active { transform: scale(0.96); }
+        .btn-dm {
+            background: linear-gradient(135deg, #229ED9, #0088cc);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(34,158,217,0.4);
+        }
+        .btn-mail {
+            background: linear-gradient(135deg, #00cc44, #0eff00);
+            color: #000;
+            box-shadow: 0 4px 14px rgba(0, 255, 0, 0.4);
+        }
+        .contact-note {
+            color: #888;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+        .contact-note b { color: #0eff00; }
+
+        @media (max-width: 500px) {
+            #panel {
+                padding: 20px 16px 16px;
+                border-radius: 28px;
+                width: 94%;
+            }
+            .title { font-size: 20px; }
+            .toggle-label { font-size: 16px; }
+            .toggle { width: 54px; height: 28px; }
+            .toggle .knob { width: 22px; height: 22px; top: 3px; left: 3px; }
+            .toggle.on .knob { transform: translateX(26px); }
+            .info-steps { font-size: 12px; }
+            .vip-btn { font-size: 13px; padding: 6px 14px; }
+            #proof-ticker { font-size: 11px; top: 12px; padding: 4px 12px; }
+            .input-row input { font-size: 12px; padding: 6px 12px; }
+            .btn { font-size: 12px; padding: 6px 12px; }
+            .ref-link { font-size: 11px; }
+            #bottom-ad { min-height: 45px; padding: 4px 6px; }
+            #cross .ring { width: 36px; height: 36px; }
+            #cross .ring .label { font-size: 9px; top: -28px; padding: 2px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="magnet"></div>
+
+<!-- ===== CROSSHAIR – VISIBLE & AGGRESSIVE ===== -->
+<div id="cross">
+    <div class="ring">
+        <div class="dot"></div>
+        <div class="label">HEAD</div>
+    </div>
+</div>
+
+<div id="proof-ticker"></div>
+
+<!-- ===== MAIN PANEL ===== -->
+<div id="panel">
+    <div class="header">
+        <div class="title">Aim Assist <span class="badge">Pro</span></div>
+        <div class="status-badge" id="status-badge"><span class="dot"></span><span id="status-text">Off</span></div>
+    </div>
+
+    <div class="toggle-row">
+        <div class="toggle-label">Head Lock <span class="sub">Zero recoil · snap to head</span></div>
+        <div class="toggle" id="toggle"><div class="knob"></div></div>
+    </div>
+
+    <div class="meter-section">
+        <div class="meter-header"><span>Recoil compensation</span><span class="val" id="recoil-percent">0%</span></div>
+        <div class="meter-bar"><div id="recoil-fill"></div></div>
+    </div>
+
+    <!-- AD SLOT #1 -->
+    <div class="ad-container" id="ad-slot-1">
+        <span class="ad-label">📢 Ad Space</span>
+    </div>
+
+    <!-- REFERRAL -->
+    <div class="ref-section">
+        <div class="ref-header" id="refToggle">
+            <span class="title">👥 Referral Program</span>
+            <span class="arrow" id="refArrow">▼</span>
+        </div>
+        <div class="ref-body" id="refBody">
+            <div class="input-row">
+                <input type="text" id="usernameInput" placeholder="Choose a username" maxlength="20">
+                <button class="btn" id="setUsernameBtn">Set</button>
+            </div>
+            <div style="font-size:12px; color:rgba(255,255,255,0.3);" id="usernameDisplay">Username: <span id="usernameSpan">Not set</span></div>
+            <div class="ref-link">
+                <span id="refLinkText">Set username to get referral link</span>
+                <button class="copy-btn" id="copyRefLink">📋</button>
+            </div>
+            <div class="input-row">
+                <input type="text" id="referredInput" placeholder="Enter referred username" maxlength="20">
+                <button class="btn secondary" id="addReferredBtn">+ Add</button>
+            </div>
+            <div class="ref-list" id="refList"></div>
+            <div class="progress-row">
+                <span>Referrals: <span id="refCount">0</span>/20</span>
+                <div class="bar-wrap"><div class="bar-fill" id="refBar" style="width:0%"></div></div>
+            </div>
+            <div class="progress-row">
+                <span>Active days: <span id="daysActive">0</span>/10</span>
+                <div class="bar-wrap"><div class="bar-fill" id="daysBar" style="width:0%"></div></div>
+            </div>
+            <div class="claim-area">
+                <button class="btn gold" id="claimVipBtn" disabled>Claim VIP (3 months)</button>
+                <span style="font-size:11px; color:rgba(255,255,255,0.2);" id="claimStatus">Need 20 refs & 10 days</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- AD SLOT #2 -->
+    <div class="ad-container" id="ad-slot-2">
+        <span class="ad-label">📢 Ad Space</span>
+    </div>
+
+    <div class="info-box">
+        <div class="info-title">📋 How to use</div>
+        <div class="info-steps">
+            <strong>1.</strong> Toggle <span class="hl">Head Lock</span> ON above.<br>
+            <strong>2.</strong> Open your game – system runs <strong>in the background</strong>.<br>
+            <strong>3.</strong> Drag on the screen – crosshair <span class="hl">snaps to head</span> instantly.<br>
+            <strong>4.</strong> If it stops responding, toggle <span class="hl">OFF / ON</span> to reset.
+        </div>
+        <div class="bg-note"><span style="font-size:14px;">⚡</span> Aggressive head lock · zero recoil</div>
+    </div>
+
+    <div class="footer">
+        <a class="vip-btn" onclick="openVipModal()">👑 GET VIP</a>
+        <span class="footer-hint">drag to aim · head snap</span>
+    </div>
+</div>
+
+<!-- BOTTOM AD -->
+<div id="bottom-ad">
+    <span class="ad-label">📢 Ad</span>
+    <span style="color:rgba(255,255,255,0.2); font-size:12px;">Ad placeholder</span>
+</div>
+
+<!-- VIP MODAL -->
+<div id="vip-modal" onclick="if(event.target===this) closeVipModal()">
+    <div id="vip-card">
+        <button class="close-btn" onclick="closeVipModal()">×</button>
+        <h1>👑 dpin5000 VIP</h1>
+        <div class="sub">UNLOCK FULL HEAD LOCK POWER</div>
+        <div class="plan" onclick="choosePlan('BASIC')">
+            <div class="plan-title"><span>⚡ BASIC</span><span class="plan-price">₹500</span></div>
+            <div class="plan-feat">Head Lock + Zero Recoil</div>
+            <div class="plan-feat">1 Device Access</div>
+            <div class="plan-feat">7 Days Updates</div>
+        </div>
+        <div class="plan hot" onclick="choosePlan('PRO')">
+            <span class="badge-hot">🔥 HOT</span>
+            <div class="plan-title"><span>💎 PRO</span><span class="plan-price">₹1,500</span></div>
+            <div class="plan-feat">Super Lock Unlocked</div>
+            <div class="plan-feat">3 Devices + Custom Sensitivity</div>
+            <div class="plan-feat">30 Days Updates + Priority Support</div>
+        </div>
+        <div class="plan" onclick="choosePlan('LIFETIME')">
+            <div class="plan-title"><span>👑 LIFETIME VIP</span><span class="plan-price">₹3,000</span></div>
+            <div class="plan-feat">All PRO Features Forever</div>
+            <div class="plan-feat">Unlimited Devices</div>
+            <div class="plan-feat">Lifetime Updates + Direct DM Access</div>
+        </div>
+        <div class="contact-row">
+            <a class="contact-btn btn-dm" href="https://t.me/easyaim" target="_blank" rel="noopener">📨 DM FOR VIP</a>
+            <a class="contact-btn btn-mail" href="mailto:easyaim887@gmail.com?subject=VIP%20Access%20-%20dpin5000&body=Hi%2C%20I%20want%20VIP%20access%20to%20dpin5000.%20My%20device%3A%20%0APlan%20interested%3A%20">✉️ EMAIL</a>
+        </div>
+        <div class="contact-note">Pay via <b>UPI</b> · Instant delivery<br><b>easyaim887@gmail.com</b></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+
+    // ---- DOM ----
+    const magnet = document.getElementById('magnet');
+    const cross = document.getElementById('cross');
+    const panel = document.getElementById('panel');
+    const toggle = document.getElementById('toggle');
+    const statusBadge = document.getElementById('status-badge');
+    const statusText = document.getElementById('status-text');
+    const recoilFill = document.getElementById('recoil-fill');
+    const recoilPercent = document.getElementById('recoil-percent');
+
+    // ---- AGGRESSIVE HEAD-LOCK CONFIG ----
+    const CONFIG = {
+        // Head offset: 26% from top = perfect head level
+        HEAD_OFFSET_RATIO: 0.26,
+        // VERTICAL MAGNET: EXTREME SNAP (0.85 = 85% snap instantly)
+        VERTICAL_MAGNET: 0.85,
+        // Horizontal magnet: strong pull toward finger
+        HORIZONTAL_MAGNET: 0.30,
+        // Recoil compensation
+        MAX_RECOIL_COMP: 220,
+        RECOIL_PER_SHOT: 12.5,
+        RECOIL_DECAY_FACTOR: 0.90,
+        FIRING_WINDOW_MS: 60,
+        SMOOTHING_ALPHA: 0.08,
+        SUPER_LOCK_BOOST: 45,
+        PREDICT_WEIGHT: 0.20,
+    };
+
+    function getHeadOffset() {
+        return Math.floor(window.innerHeight * CONFIG.HEAD_OFFSET_RATIO);
+    }
+    CONFIG.HEAD_OFFSET_PX = getHeadOffset();
+
+    function updateHeadOffset() {
+        CONFIG.HEAD_OFFSET_PX = getHeadOffset();
+    }
+    window.addEventListener('resize', updateHeadOffset);
+    window.addEventListener('orientationchange', () => setTimeout(updateHeadOffset, 200));
+
+    // ---- State ----
+    let systemOn = false;
+    let aimingActive = false;
+    let currentTouchX = 0, currentTouchY = 0;
+    let crosshairX = window.innerWidth / 2;
+    let crosshairY = window.innerHeight / 2;
+    let recoilOffset = 0;
+    let rapidFireFlag = false;
+    let lastTapTime = 0;
+    let tapSequenceCount = 0;
+    let firingActive = false;
+    let animationFrameId = null;
+    let lastRawX = crosshairX, lastRawY = crosshairY;
+    let superLockActive = false;
+    let superLockTimer = null;
+    let interactionCount = 0;
+    let prevTouchX = crosshairX, prevTouchY = crosshairY;
+    let velX = 0, velY = 0;
+    let snapCounter = 0;
+
+    // ---- Referral ----
+    const STORAGE_KEY = 'dpin5000_data';
+    let userData = { username: '', referred: [], firstActive: null };
+
+    function loadData() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                userData.username = parsed.username || '';
+                userData.referred = parsed.referred || [];
+                userData.firstActive = parsed.firstActive || null;
+            }
+        } catch(e) {}
+    }
+    function saveData() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+        } catch(e) {}
+    }
+    loadData();
+
+    // ---- DOM refs for referral ----
+    const usernameInput = document.getElementById('usernameInput');
+    const setUsernameBtn = document.getElementById('setUsernameBtn');
+    const usernameSpan = document.getElementById('usernameSpan');
+    const refLinkText = document.getElementById('refLinkText');
+    const copyRefLink = document.getElementById('copyRefLink');
+    const referredInput = document.getElementById('referredInput');
+    const addReferredBtn = document.getElementById('addReferredBtn');
+    const refList = document.getElementById('refList');
+    const refCount = document.getElementById('refCount');
+    const refBar = document.getElementById('refBar');
+    const daysActive = document.getElementById('daysActive');
+    const daysBar = document.getElementById('daysBar');
+    const claimVipBtn = document.getElementById('claimVipBtn');
+    const claimStatus = document.getElementById('claimStatus');
+    const refToggle = document.getElementById('refToggle');
+    const refBody = document.getElementById('refBody');
+    const refArrow = document.getElementById('refArrow');
+
+    // ---- Crosshair update ----
+    function updateCrosshair(x, y) {
+        const bx = clamp(x, 20, window.innerWidth - 20);
+        const by = clamp(y, 20, window.innerHeight - 20);
+        cross.style.transform = `translate(${bx}px, ${by}px)`;
+        crosshairX = bx;
+        crosshairY = by;
+    }
+
+    // ---- Helpers ----
+    const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+    function computeHeadPosition(touchX, touchY, recoilVal) {
+        const headOffset = CONFIG.HEAD_OFFSET_PX;
+        const centerX = window.innerWidth / 2;
+
+        // Velocity prediction for smoother tracking
+        const dx = touchX - prevTouchX;
+        const dy = touchY - prevTouchY;
+        velX = velX * 0.80 + dx * 0.20;
+        velY = velY * 0.80 + dy * 0.20;
+        const predX = touchX + velX * CONFIG.PREDICT_WEIGHT;
+        const predY = touchY + velY * CONFIG.PREDICT_WEIGHT;
+
+        // Horizontal: strong magnet
+        const targetX = predX + (centerX - predX) * CONFIG.HORIZONTAL_MAGNET;
+
+        // Vertical: EXTREME SNAP to head level
+        const idealHeadY = predY - headOffset + recoilVal;
+        const currentY = crosshairY || idealHeadY;
+        // AGGRESSIVE: 85% of the way to ideal head position instantly
+        const snappedY = currentY + (idealHeadY - currentY) * CONFIG.VERTICAL_MAGNET;
+
+        let targetY = snappedY;
+        if (superLockActive) {
+            // Super lock: 99.5% snap, almost perfect lock
+            targetY = idealHeadY * 0.995 + snappedY * 0.005;
+        }
+
+        prevTouchX = touchX;
+        prevTouchY = touchY;
+
+        return {
+            x: clamp(targetX, 20, window.innerWidth - 20),
+            y: clamp(targetY, 20, window.innerHeight - 20)
+        };
+    }
+
+    function smoothPosition(rawX, rawY) {
+        const a = CONFIG.SMOOTHING_ALPHA;
+        const sx = lastRawX * (1 - a) + rawX * a;
+        const sy = lastRawY * (1 - a) + rawY * a;
+        lastRawX = sx;
+        lastRawY = sy;
+        return { x: sx, y: sy };
+    }
+
+    function updateRecoilUI() {
+        const percent = Math.min(100, (recoilOffset / CONFIG.MAX_RECOIL_COMP) * 100);
+        recoilFill.style.width = percent + '%';
+        recoilPercent.textContent = Math.floor(percent) + '%';
+    }
+
+    function applyRecoilCompensation(isRapid) {
+        if (!aimingActive || !systemOn) {
+            recoilOffset *= CONFIG.RECOIL_DECAY_FACTOR * 1.04;
+            if (recoilOffset < 0.5) recoilOffset = 0;
+            updateRecoilUI();
+            return;
+        }
+        if (isRapid || firingActive) {
+            recoilOffset = Math.min(CONFIG.MAX_RECOIL_COMP, recoilOffset + CONFIG.RECOIL_PER_SHOT);
+        } else {
+            recoilOffset *= CONFIG.RECOIL_DECAY_FACTOR;
+            if (recoilOffset < 0.2) recoilOffset = 0;
+        }
+        updateRecoilUI();
+    }
+
+    function activateSuperLock() {
+        if (superLockActive) return;
+        superLockActive = true;
+        recoilOffset = Math.min(CONFIG.MAX_RECOIL_COMP, recoilOffset + CONFIG.SUPER_LOCK_BOOST);
+        cross.classList.add('locked');
+        if (superLockTimer) clearTimeout(superLockTimer);
+        superLockTimer = setTimeout(() => {
+            superLockActive = false;
+            cross.classList.remove('locked');
+            panel.style.borderColor = '';
+            panel.style.boxShadow = '';
+        }, 5000);
+        panel.style.borderColor = 'rgba(255, 136, 0, 0.6)';
+        panel.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.7), 0 0 60px rgba(255, 136, 0, 0.2)';
+        showProofTicker('⚡ SUPER LOCK ACTIVATED');
+    }
+
+    // ---- Main loop ----
+    function updateLoop() {
+        if (!systemOn) {
+            if (!aimingActive) {
+                recoilOffset *= CONFIG.RECOIL_DECAY_FACTOR * 1.04;
+                if (recoilOffset < 0.5) recoilOffset = 0;
+                updateRecoilUI();
+                cross.classList.remove('active', 'locked', 'snap');
+            }
+            animationFrameId = requestAnimationFrame(updateLoop);
+            return;
+        }
+
+        if (!aimingActive || currentTouchX === 0) {
+            applyRecoilCompensation(false);
+            cross.classList.remove('active', 'snap');
+            animationFrameId = requestAnimationFrame(updateLoop);
+            return;
+        }
+
+        // Active aiming
+        cross.classList.add('active');
+        const smoothed = smoothPosition(currentTouchX, currentTouchY);
+        const now = Date.now();
+        const isRapidNow = rapidFireFlag || firingActive || (now - lastTapTime < 100);
+        applyRecoilCompensation(isRapidNow);
+
+        const target = computeHeadPosition(smoothed.x, smoothed.y, recoilOffset);
+        updateCrosshair(target.x, target.y);
+
+        // Auto-super-lock on high precision
+        const perfectY = currentTouchY - CONFIG.HEAD_OFFSET_PX + recoilOffset;
+        const error = Math.abs(perfectY - crosshairY);
+        const precision = clamp(100 - error * 1.1, 80, 100);
+        if (precision > 95 && (firingActive || rapidFireFlag) && !superLockActive) {
+            activateSuperLock();
+        }
+
+        // Snap visual pulse
+        if (Math.abs(error) < 3 && snapCounter % 10 === 0) {
+            cross.classList.add('snap');
+            setTimeout(() => cross.classList.remove('snap'), 150);
+        }
+        snapCounter++;
+
+        animationFrameId = requestAnimationFrame(updateLoop);
+    }
+
+    // ---- Touch handlers ----
+    function handleTouchStart(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        if (!touch) return;
+        currentTouchX = touch.clientX;
+        currentTouchY = touch.clientY;
+        aimingActive = true;
+        lastRawX = currentTouchX;
+        lastRawY = currentTouchY;
+        prevTouchX = currentTouchX;
+        prevTouchY = currentTouchY;
+
+        if (interactionCount === 0) {
+            if (!userData.firstActive) {
+                userData.firstActive = Date.now();
+                saveData();
+            }
+            updateReferralUI();
+        }
+        interactionCount++;
+
+        if (navigator.vibrate) navigator.vibrate(8);
+
+        const now = Date.now();
+        const delta = now - lastTapTime;
+        if (delta < CONFIG.FIRING_WINDOW_MS) {
+            rapidFireFlag = true;
+            firingActive = true;
+            recoilOffset += CONFIG.RECOIL_PER_SHOT * 1.5;
+            tapSequenceCount++;
+            if (tapSequenceCount >= 3) {
+                activateSuperLock();
+                recoilOffset = Math.min(CONFIG.MAX_RECOIL_COMP, recoilOffset + 35);
+                tapSequenceCount = 0;
+            }
+        } else {
+            rapidFireFlag = false;
+            firingActive = false;
+            tapSequenceCount = 1;
+        }
+        lastTapTime = now;
+
+        // INSTANT SNAP on touch start
+        const snapPos = computeHeadPosition(currentTouchX, currentTouchY, recoilOffset);
+        updateCrosshair(snapPos.x, snapPos.y);
+        cross.classList.add('snap');
+        setTimeout(() => cross.classList.remove('snap'), 200);
+    }
+
+    function handleTouchMove(e) {
+        e.preventDefault();
+        if (!aimingActive) return;
+        const touch = e.touches[0];
+        if (!touch) return;
+        currentTouchX = touch.clientX;
+        currentTouchY = touch.clientY;
+    }
+
+    function handleTouchEnd(e) {
+        e.preventDefault();
+        aimingActive = false;
+        setTimeout(() => {
+            if (!aimingActive) {
+                firingActive = false;
+                rapidFireFlag = false;
+                tapSequenceCount = 0;
+            }
+        }, 100);
+        lastRawX = crosshairX;
+        lastRawY = crosshairY;
+    }
+
+    // ---- Toggle system ----
+    function toggleSystem() {
+        systemOn = !systemOn;
+        if (systemOn) {
+            toggle.classList.add('on');
+            panel.classList.add('active');
+            statusBadge.className = 'status-badge on';
+            statusText.textContent = 'On';
+            crosshairX = window.innerWidth / 2;
+            crosshairY = window.innerHeight / 2;
+            updateCrosshair(crosshairX, crosshairY);
+            showProofTicker('⚡ HEAD LOCK ACTIVE · SNAP ENGAGED');
+        } else {
+            toggle.classList.remove('on');
+            panel.classList.remove('active');
+            statusBadge.className = 'status-badge';
+            statusText.textContent = 'Off';
+            cross.classList.remove('locked', 'active', 'snap');
+            recoilOffset = 0;
+            updateRecoilUI();
+            showProofTicker('⏸ HEAD LOCK PAUSED');
+        }
+    }
+
+    // ---- Referral UI ----
+    function updateReferralUI() {
+        usernameSpan.textContent = userData.username || 'Not set';
+        usernameInput.value = userData.username || '';
+        if (userData.username) {
+            refLinkText.textContent = `https://dpin5000.page/ref/${encodeURIComponent(userData.username)}`;
+        } else {
+            refLinkText.textContent = 'Set username to get referral link';
+        }
+        renderRefList();
+
+        const refs = userData.referred.length;
+        refCount.textContent = refs;
+        refBar.style.width = Math.min(100, (refs / 20) * 100) + '%';
+
+        let days = 0;
+        if (userData.firstActive) {
+            const diff = Date.now() - userData.firstActive;
+            days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        }
+        daysActive.textContent = days;
+        daysBar.style.width = Math.min(100, (days / 10) * 100) + '%';
+
+        const eligible = (refs >= 20 && days >= 10);
+        claimVipBtn.disabled = !eligible;
+        if (eligible) {
+            claimStatus.textContent = '✅ Ready to claim!';
+            claimStatus.style.color = '#0eff00';
+        } else {
+            claimStatus.textContent = `Need ${20 - refs} more refs & ${10 - days} more days`;
+            claimStatus.style.color = 'rgba(255,255,255,0.2)';
+        }
+    }
+
+    function renderRefList() {
+        refList.innerHTML = '';
+        userData.referred.forEach((uname, index) => {
+            const tag = document.createElement('span');
+            tag.className = 'ref-tag';
+            tag.innerHTML = `${uname} <span class="remove" data-index="${index}">✕</span>`;
+            refList.appendChild(tag);
+        });
+        document.querySelectorAll('.ref-tag .remove').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const idx = parseInt(this.dataset.index);
+                userData.referred.splice(idx, 1);
+                saveData();
+                updateReferralUI();
+            });
+        });
+    }
+
+    // ---- Referral events ----
+    setUsernameBtn.addEventListener('click', function() {
+        const val = usernameInput.value.trim();
+        if (val.length < 3) {
+            showProofTicker('⚠️ Username must be at least 3 characters');
+            return;
+        }
+        userData.username = val;
+        saveData();
+        updateReferralUI();
+        showProofTicker(`✅ Username set to ${val}`);
+    });
+
+    addReferredBtn.addEventListener('click', function() {
+        const val = referredInput.value.trim();
+        if (!val) return;
+        if (val === userData.username) {
+            showProofTicker('⚠️ Cannot refer yourself');
+            return;
+        }
+        if (userData.referred.includes(val)) {
+            showProofTicker('⚠️ Already added');
+            return;
+        }
+        userData.referred.push(val);
+        saveData();
+        updateReferralUI();
+        referredInput.value = '';
+        showProofTicker(`✅ ${val} added as referral`);
+    });
+
+    copyRefLink.addEventListener('click', function() {
+        const link = refLinkText.textContent;
+        if (link.startsWith('Set username')) {
+            showProofTicker('⚠️ Set username first');
+            return;
+        }
+        navigator.clipboard.writeText(link).then(() => {
+            showProofTicker('📋 Referral link copied!');
+        }).catch(() => {
+            const textarea = document.createElement('textarea');
+            textarea.value = link;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showProofTicker('📋 Referral link copied!');
+        });
+    });
+
+    let refOpen = false;
+    refToggle.addEventListener('click', function() {
+        refOpen = !refOpen;
+        refBody.classList.toggle('open', refOpen);
+        refArrow.classList.toggle('open', refOpen);
+    });
+
+    claimVipBtn.addEventListener('click', function() {
+        const refs = userData.referred;
+        if (refs.length < 20) {
+            showProofTicker('⚠️ Need 20 referrals');
+            return;
+        }
+        const days = Math.floor((Date.now() - userData.firstActive) / (1000*60*60*24));
+        if (days < 10) {
+            showProofTicker('⚠️ Need 10 active days');
+            return;
+        }
+        const subject = encodeURIComponent('VIP Claim - Referral Program');
+        const body = encodeURIComponent(
+            `Hi,\n\nI have completed the referral program.\n\nMy username: ${userData.username}\nActive days: ${days}\nReferred users (${refs.length}):\n${refs.join('\n')}\n\nPlease activate my VIP for 3 months.\n\nThanks!`
+        );
+        window.location.href = `mailto:easyaim887@gmail.com?subject=${subject}&body=${body}`;
+        showProofTicker('📨 Opening email to claim VIP...');
+    });
+
+    // ---- Mouse fallback ----
+    magnet.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const fake = { touches: [{ clientX: e.clientX, clientY: e.clientY }] };
+        handleTouchStart(fake);
+        const onMove = (me) => {
+            me.preventDefault();
+            const fakeMove = { touches: [{ clientX: me.clientX, clientY: me.clientY }] };
+            handleTouchMove(fakeMove);
+        };
+        const onUp = () => {
+            handleTouchEnd(new Event('touchend'));
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+        };
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+    });
+
+    // ---- Proof ticker ----
+    const proofMessages = [
+        '🔥 30+ PLAYERS USING dpin5000 TODAY',
+        '👑 VIP ACCESS UNLOCKS SUPER LOCK',
+        '⚡ HEAD LOCK ACTIVE · 99% ACCURACY',
+        '🎯 +47 HEADSHOTS LAST HOUR',
+        '💎 PRO PLAN · ₹1,500 · 3 DEVICES',
+    ];
+    let proofIndex = 0;
+
+    function showProofTicker(msg) {
+        const ticker = document.getElementById('proof-ticker');
+        ticker.textContent = msg;
+        ticker.classList.add('show');
+        setTimeout(() => ticker.classList.remove('show'), 3500);
+    }
+
+    setInterval(() => {
+        if (interactionCount > 5) {
+            showProofTicker(proofMessages[proofIndex % proofMessages.length]);
+            proofIndex++;
+        }
+    }, 8000);
+
+    // ---- VIP Modal ----
+    window.openVipModal = function() {
+        document.getElementById('vip-modal').classList.add('show');
+        if (navigator.vibrate) navigator.vibrate([20, 50, 20]);
+    };
+    window.closeVipModal = function() {
+        document.getElementById('vip-modal').classList.remove('show');
+    };
+    window.choosePlan = function(plan) {
+        const subject = encodeURIComponent(`VIP ${plan} - dpin5000`);
+        const body = encodeURIComponent(`Hi,\n\nI want to upgrade to ${plan}.\n\nMy device:\nMy UPI ID for payment:\n\nThanks!`);
+        window.location.href = `mailto:easyaim887@gmail.com?subject=${subject}&body=${body}`;
+    };
+
+    // ---- Init ----
+    function init() {
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        updateCrosshair(centerX, centerY);
+        updateHeadOffset();
+        try {
+            document.documentElement.requestFullscreen?.();
+            if (screen.orientation?.lock) screen.orientation.lock('landscape-primary');
+        } catch(e) {}
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(updateLoop);
+        updateReferralUI();
+        setTimeout(() => showProofTicker('🎯 HEAD SNAP ACTIVE · DRAG TO AIM'), 2000);
+    }
+
+    // ---- Events ----
+    magnet.addEventListener('touchstart', handleTouchStart, { passive: false });
+    magnet.addEventListener('touchmove', handleTouchMove, { passive: false });
+    magnet.addEventListener('touchend', handleTouchEnd);
+    magnet.addEventListener('touchcancel', handleTouchEnd);
+    toggle.addEventListener('click', toggleSystem);
+    toggle.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); toggleSystem(); });
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    window.addEventListener('resize', () => {
+        updateHeadOffset();
+        if (!aimingActive) {
+            const cx = clamp(crosshairX, 20, window.innerWidth - 20);
+            const cy = clamp(crosshairY, 20, window.innerHeight - 20);
+            updateCrosshair(cx, cy);
+        }
+    });
+
+    // Rapid-fire monitor
+    setInterval(() => {
+        if (systemOn && aimingActive && Date.now() - lastTapTime < 110) {
+            if (!firingActive) firingActive = true;
+            rapidFireFlag = true;
+        } else {
+            if (!aimingActive) {
+                firingActive = false;
+                rapidFireFlag = false;
+            } else if (Date.now() - lastTapTime > 200) {
+                firingActive = false;
+                rapidFireFlag = false;
+            }
+        }
+    }, 60);
+
+    init();
+    console.log('🎯 HEAD LOCK PRO · aggressive snap · crosshair visible');
+})();
+</script>
+</body>
+</html>
