@@ -154,6 +154,8 @@
             min-height: 50px;
             pointer-events: auto;
             transition: all 0.2s;
+            overflow: hidden;
+            flex-direction: column;
         }
         .ad-container:hover {
             background: rgba(255, 255, 255, 0.06);
@@ -163,6 +165,11 @@
             color: rgba(255, 255, 255, 0.15);
             letter-spacing: 1px;
             text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .ad-container iframe {
+            max-width: 100%;
+            border: none;
         }
 
         #bottom-ad {
@@ -180,6 +187,7 @@
             padding: 6px 8px;
             pointer-events: auto;
             min-height: 55px;
+            flex-direction: column;
         }
         #bottom-ad .ad-label {
             position: absolute;
@@ -189,6 +197,10 @@
             color: rgba(255, 255, 255, 0.15);
             letter-spacing: 1px;
             text-transform: uppercase;
+        }
+        #bottom-ad iframe {
+            max-width: 100%;
+            border: none;
         }
 
         /* ===== PANEL ELEMENTS ===== */
@@ -783,9 +795,19 @@
         <div class="meter-bar"><div id="recoil-fill"></div></div>
     </div>
 
-    <!-- AD SLOT #1 -->
+    <!-- AD SLOT #1 — 300x250 -->
     <div class="ad-container" id="ad-slot-1">
-        <span class="ad-label">📢 Ad Space</span>
+        <span class="ad-label">📢 Sponsored</span>
+        <script>
+            atOptions = {
+                'key' : '123380bea5692c9fb5e784903ec4fd75',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+            };
+        </script>
+        <script src="https://www.highperformanceformat.com/123380bea5692c9fb5e784903ec4fd75/invoke.js"></script>
     </div>
 
     <!-- REFERRAL -->
@@ -824,9 +846,26 @@
         </div>
     </div>
 
-    <!-- AD SLOT #2 -->
+    <!-- AD SLOT #2 — 468x60 -->
     <div class="ad-container" id="ad-slot-2">
-        <span class="ad-label">📢 Ad Space</span>
+        <span class="ad-label">📢 Sponsored</span>
+        <script>
+            atOptions = {
+                'key' : 'b238d75702f259222eca22c7024e69f0',
+                'format' : 'iframe',
+                'height' : 60,
+                'width' : 468,
+                'params' : {}
+            };
+        </script>
+        <script src="https://www.highperformanceformat.com/b238d75702f259222eca22c7024e69f0/invoke.js"></script>
+    </div>
+
+    <!-- AD SLOT #3 — container-based (effectivecpm) -->
+    <div class="ad-container" id="ad-slot-3">
+        <span class="ad-label">📢 Sponsored</span>
+        <div id="container-404a2dc8f7f3d90647e6cd28f563e982"></div>
+        <script async="async" data-cfasync="false" src="https://pl30299527.effectivecpmnetwork.com/404a2dc8f7f3d90647e6cd28f563e982/invoke.js"></script>
     </div>
 
     <div class="info-box">
@@ -846,10 +885,19 @@
     </div>
 </div>
 
-<!-- BOTTOM AD -->
+<!-- BOTTOM AD — 320x50 -->
 <div id="bottom-ad">
     <span class="ad-label">📢 Ad</span>
-    <span style="color:rgba(255,255,255,0.2); font-size:12px;">Ad placeholder</span>
+    <script>
+        atOptions = {
+            'key' : '1a798fa54043692ad67984af5de94bc0',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+        };
+    </script>
+    <script src="https://www.highperformanceformat.com/1a798fa54043692ad67984af5de94bc0/invoke.js"></script>
 </div>
 
 <!-- VIP MODAL -->
@@ -885,591 +933,601 @@
     </div>
 </div>
 
+<!-- FIFTH AD — effectivecpmnetwork script -->
+<script src="https://pl30299526.effectivecpmnetwork.com/72/86/8c/72868c072822b3baded9d53382038dea.js"></script>
+
 <script>
-(function() {
-    'use strict';
+    (function() {
+        'use strict';
 
-    // ---- DOM ----
-    const magnet = document.getElementById('magnet');
-    const cross = document.getElementById('cross');
-    const panel = document.getElementById('panel');
-    const toggle = document.getElementById('toggle');
-    const statusBadge = document.getElementById('status-badge');
-    const statusText = document.getElementById('status-text');
-    const recoilFill = document.getElementById('recoil-fill');
-    const recoilPercent = document.getElementById('recoil-percent');
+        // ---- DOM ----
+        const magnet = document.getElementById('magnet');
+        const cross = document.getElementById('cross');
+        const panel = document.getElementById('panel');
+        const toggle = document.getElementById('toggle');
+        const statusBadge = document.getElementById('status-badge');
+        const statusText = document.getElementById('status-text');
+        const recoilFill = document.getElementById('recoil-fill');
+        const recoilPercent = document.getElementById('recoil-percent');
 
-    // ---- AGGRESSIVE HEAD-LOCK CONFIG ----
-    const CONFIG = {
-        // Head offset: 26% from top = perfect head level
-        HEAD_OFFSET_RATIO: 0.26,
-        // VERTICAL MAGNET: EXTREME SNAP (0.85 = 85% snap instantly)
-        VERTICAL_MAGNET: 0.85,
-        // Horizontal magnet: strong pull toward finger
-        HORIZONTAL_MAGNET: 0.30,
-        // Recoil compensation
-        MAX_RECOIL_COMP: 220,
-        RECOIL_PER_SHOT: 12.5,
-        RECOIL_DECAY_FACTOR: 0.90,
-        FIRING_WINDOW_MS: 60,
-        SMOOTHING_ALPHA: 0.08,
-        SUPER_LOCK_BOOST: 45,
-        PREDICT_WEIGHT: 0.20,
-    };
-
-    function getHeadOffset() {
-        return Math.floor(window.innerHeight * CONFIG.HEAD_OFFSET_RATIO);
-    }
-    CONFIG.HEAD_OFFSET_PX = getHeadOffset();
-
-    function updateHeadOffset() {
-        CONFIG.HEAD_OFFSET_PX = getHeadOffset();
-    }
-    window.addEventListener('resize', updateHeadOffset);
-    window.addEventListener('orientationchange', () => setTimeout(updateHeadOffset, 200));
-
-    // ---- State ----
-    let systemOn = false;
-    let aimingActive = false;
-    let currentTouchX = 0, currentTouchY = 0;
-    let crosshairX = window.innerWidth / 2;
-    let crosshairY = window.innerHeight / 2;
-    let recoilOffset = 0;
-    let rapidFireFlag = false;
-    let lastTapTime = 0;
-    let tapSequenceCount = 0;
-    let firingActive = false;
-    let animationFrameId = null;
-    let lastRawX = crosshairX, lastRawY = crosshairY;
-    let superLockActive = false;
-    let superLockTimer = null;
-    let interactionCount = 0;
-    let prevTouchX = crosshairX, prevTouchY = crosshairY;
-    let velX = 0, velY = 0;
-    let snapCounter = 0;
-
-    // ---- Referral ----
-    const STORAGE_KEY = 'dpin5000_data';
-    let userData = { username: '', referred: [], firstActive: null };
-
-    function loadData() {
-        try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                userData.username = parsed.username || '';
-                userData.referred = parsed.referred || [];
-                userData.firstActive = parsed.firstActive || null;
-            }
-        } catch(e) {}
-    }
-    function saveData() {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-        } catch(e) {}
-    }
-    loadData();
-
-    // ---- DOM refs for referral ----
-    const usernameInput = document.getElementById('usernameInput');
-    const setUsernameBtn = document.getElementById('setUsernameBtn');
-    const usernameSpan = document.getElementById('usernameSpan');
-    const refLinkText = document.getElementById('refLinkText');
-    const copyRefLink = document.getElementById('copyRefLink');
-    const referredInput = document.getElementById('referredInput');
-    const addReferredBtn = document.getElementById('addReferredBtn');
-    const refList = document.getElementById('refList');
-    const refCount = document.getElementById('refCount');
-    const refBar = document.getElementById('refBar');
-    const daysActive = document.getElementById('daysActive');
-    const daysBar = document.getElementById('daysBar');
-    const claimVipBtn = document.getElementById('claimVipBtn');
-    const claimStatus = document.getElementById('claimStatus');
-    const refToggle = document.getElementById('refToggle');
-    const refBody = document.getElementById('refBody');
-    const refArrow = document.getElementById('refArrow');
-
-    // ---- Crosshair update ----
-    function updateCrosshair(x, y) {
-        const bx = clamp(x, 20, window.innerWidth - 20);
-        const by = clamp(y, 20, window.innerHeight - 20);
-        cross.style.transform = `translate(${bx}px, ${by}px)`;
-        crosshairX = bx;
-        crosshairY = by;
-    }
-
-    // ---- Helpers ----
-    const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-
-    function computeHeadPosition(touchX, touchY, recoilVal) {
-        const headOffset = CONFIG.HEAD_OFFSET_PX;
-        const centerX = window.innerWidth / 2;
-
-        // Velocity prediction for smoother tracking
-        const dx = touchX - prevTouchX;
-        const dy = touchY - prevTouchY;
-        velX = velX * 0.80 + dx * 0.20;
-        velY = velY * 0.80 + dy * 0.20;
-        const predX = touchX + velX * CONFIG.PREDICT_WEIGHT;
-        const predY = touchY + velY * CONFIG.PREDICT_WEIGHT;
-
-        // Horizontal: strong magnet
-        const targetX = predX + (centerX - predX) * CONFIG.HORIZONTAL_MAGNET;
-
-        // Vertical: EXTREME SNAP to head level
-        const idealHeadY = predY - headOffset + recoilVal;
-        const currentY = crosshairY || idealHeadY;
-        // AGGRESSIVE: 85% of the way to ideal head position instantly
-        const snappedY = currentY + (idealHeadY - currentY) * CONFIG.VERTICAL_MAGNET;
-
-        let targetY = snappedY;
-        if (superLockActive) {
-            // Super lock: 99.5% snap, almost perfect lock
-            targetY = idealHeadY * 0.995 + snappedY * 0.005;
-        }
-
-        prevTouchX = touchX;
-        prevTouchY = touchY;
-
-        return {
-            x: clamp(targetX, 20, window.innerWidth - 20),
-            y: clamp(targetY, 20, window.innerHeight - 20)
+        // ---- AGGRESSIVE HEAD-LOCK CONFIG ----
+        const CONFIG = {
+            // Head offset: 26% from top = perfect head level
+            HEAD_OFFSET_RATIO: 0.26,
+            // VERTICAL MAGNET: EXTREME SNAP (0.85 = 85% snap instantly)
+            VERTICAL_MAGNET: 0.85,
+            // Horizontal magnet: strong pull toward finger
+            HORIZONTAL_MAGNET: 0.30,
+            // Recoil compensation
+            MAX_RECOIL_COMP: 220,
+            RECOIL_PER_SHOT: 12.5,
+            RECOIL_DECAY_FACTOR: 0.90,
+            FIRING_WINDOW_MS: 60,
+            SMOOTHING_ALPHA: 0.08,
+            SUPER_LOCK_BOOST: 45,
+            PREDICT_WEIGHT: 0.20,
         };
-    }
 
-    function smoothPosition(rawX, rawY) {
-        const a = CONFIG.SMOOTHING_ALPHA;
-        const sx = lastRawX * (1 - a) + rawX * a;
-        const sy = lastRawY * (1 - a) + rawY * a;
-        lastRawX = sx;
-        lastRawY = sy;
-        return { x: sx, y: sy };
-    }
-
-    function updateRecoilUI() {
-        const percent = Math.min(100, (recoilOffset / CONFIG.MAX_RECOIL_COMP) * 100);
-        recoilFill.style.width = percent + '%';
-        recoilPercent.textContent = Math.floor(percent) + '%';
-    }
-
-    function applyRecoilCompensation(isRapid) {
-        if (!aimingActive || !systemOn) {
-            recoilOffset *= CONFIG.RECOIL_DECAY_FACTOR * 1.04;
-            if (recoilOffset < 0.5) recoilOffset = 0;
-            updateRecoilUI();
-            return;
+        function getHeadOffset() {
+            return Math.floor(window.innerHeight * CONFIG.HEAD_OFFSET_RATIO);
         }
-        if (isRapid || firingActive) {
-            recoilOffset = Math.min(CONFIG.MAX_RECOIL_COMP, recoilOffset + CONFIG.RECOIL_PER_SHOT);
-        } else {
-            recoilOffset *= CONFIG.RECOIL_DECAY_FACTOR;
-            if (recoilOffset < 0.2) recoilOffset = 0;
+        CONFIG.HEAD_OFFSET_PX = getHeadOffset();
+
+        function updateHeadOffset() {
+            CONFIG.HEAD_OFFSET_PX = getHeadOffset();
         }
-        updateRecoilUI();
-    }
+        window.addEventListener('resize', updateHeadOffset);
+        window.addEventListener('orientationchange', () => setTimeout(updateHeadOffset, 200));
 
-    function activateSuperLock() {
-        if (superLockActive) return;
-        superLockActive = true;
-        recoilOffset = Math.min(CONFIG.MAX_RECOIL_COMP, recoilOffset + CONFIG.SUPER_LOCK_BOOST);
-        cross.classList.add('locked');
-        if (superLockTimer) clearTimeout(superLockTimer);
-        superLockTimer = setTimeout(() => {
-            superLockActive = false;
-            cross.classList.remove('locked');
-            panel.style.borderColor = '';
-            panel.style.boxShadow = '';
-        }, 5000);
-        panel.style.borderColor = 'rgba(255, 136, 0, 0.6)';
-        panel.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.7), 0 0 60px rgba(255, 136, 0, 0.2)';
-        showProofTicker('⚡ SUPER LOCK ACTIVATED');
-    }
+        // ---- State ----
+        let systemOn = false;
+        let aimingActive = false;
+        let currentTouchX = 0,
+            currentTouchY = 0;
+        let crosshairX = window.innerWidth / 2;
+        let crosshairY = window.innerHeight / 2;
+        let recoilOffset = 0;
+        let rapidFireFlag = false;
+        let lastTapTime = 0;
+        let tapSequenceCount = 0;
+        let firingActive = false;
+        let animationFrameId = null;
+        let lastRawX = crosshairX,
+            lastRawY = crosshairY;
+        let superLockActive = false;
+        let superLockTimer = null;
+        let interactionCount = 0;
+        let prevTouchX = crosshairX,
+            prevTouchY = crosshairY;
+        let velX = 0,
+            velY = 0;
+        let snapCounter = 0;
 
-    // ---- Main loop ----
-    function updateLoop() {
-        if (!systemOn) {
-            if (!aimingActive) {
+        // ---- Referral ----
+        const STORAGE_KEY = 'dpin5000_data';
+        let userData = { username: '', referred: [], firstActive: null };
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    userData.username = parsed.username || '';
+                    userData.referred = parsed.referred || [];
+                    userData.firstActive = parsed.firstActive || null;
+                }
+            } catch (e) {}
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+            } catch (e) {}
+        }
+        loadData();
+
+        // ---- DOM refs for referral ----
+        const usernameInput = document.getElementById('usernameInput');
+        const setUsernameBtn = document.getElementById('setUsernameBtn');
+        const usernameSpan = document.getElementById('usernameSpan');
+        const refLinkText = document.getElementById('refLinkText');
+        const copyRefLink = document.getElementById('copyRefLink');
+        const referredInput = document.getElementById('referredInput');
+        const addReferredBtn = document.getElementById('addReferredBtn');
+        const refList = document.getElementById('refList');
+        const refCount = document.getElementById('refCount');
+        const refBar = document.getElementById('refBar');
+        const daysActive = document.getElementById('daysActive');
+        const daysBar = document.getElementById('daysBar');
+        const claimVipBtn = document.getElementById('claimVipBtn');
+        const claimStatus = document.getElementById('claimStatus');
+        const refToggle = document.getElementById('refToggle');
+        const refBody = document.getElementById('refBody');
+        const refArrow = document.getElementById('refArrow');
+
+        // ---- Crosshair update ----
+        function updateCrosshair(x, y) {
+            const bx = clamp(x, 20, window.innerWidth - 20);
+            const by = clamp(y, 20, window.innerHeight - 20);
+            cross.style.transform = `translate(${bx}px, ${by}px)`;
+            crosshairX = bx;
+            crosshairY = by;
+        }
+
+        // ---- Helpers ----
+        const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+        function computeHeadPosition(touchX, touchY, recoilVal) {
+            const headOffset = CONFIG.HEAD_OFFSET_PX;
+            const centerX = window.innerWidth / 2;
+
+            // Velocity prediction for smoother tracking
+            const dx = touchX - prevTouchX;
+            const dy = touchY - prevTouchY;
+            velX = velX * 0.80 + dx * 0.20;
+            velY = velY * 0.80 + dy * 0.20;
+            const predX = touchX + velX * CONFIG.PREDICT_WEIGHT;
+            const predY = touchY + velY * CONFIG.PREDICT_WEIGHT;
+
+            // Horizontal: strong magnet
+            const targetX = predX + (centerX - predX) * CONFIG.HORIZONTAL_MAGNET;
+
+            // Vertical: EXTREME SNAP to head level
+            const idealHeadY = predY - headOffset + recoilVal;
+            const currentY = crosshairY || idealHeadY;
+            // AGGRESSIVE: 85% of the way to ideal head position instantly
+            const snappedY = currentY + (idealHeadY - currentY) * CONFIG.VERTICAL_MAGNET;
+
+            let targetY = snappedY;
+            if (superLockActive) {
+                // Super lock: 99.5% snap, almost perfect lock
+                targetY = idealHeadY * 0.995 + snappedY * 0.005;
+            }
+
+            prevTouchX = touchX;
+            prevTouchY = touchY;
+
+            return {
+                x: clamp(targetX, 20, window.innerWidth - 20),
+                y: clamp(targetY, 20, window.innerHeight - 20)
+            };
+        }
+
+        function smoothPosition(rawX, rawY) {
+            const a = CONFIG.SMOOTHING_ALPHA;
+            const sx = lastRawX * (1 - a) + rawX * a;
+            const sy = lastRawY * (1 - a) + rawY * a;
+            lastRawX = sx;
+            lastRawY = sy;
+            return { x: sx, y: sy };
+        }
+
+        function updateRecoilUI() {
+            const percent = Math.min(100, (recoilOffset / CONFIG.MAX_RECOIL_COMP) * 100);
+            recoilFill.style.width = percent + '%';
+            recoilPercent.textContent = Math.floor(percent) + '%';
+        }
+
+        function applyRecoilCompensation(isRapid) {
+            if (!aimingActive || !systemOn) {
                 recoilOffset *= CONFIG.RECOIL_DECAY_FACTOR * 1.04;
                 if (recoilOffset < 0.5) recoilOffset = 0;
                 updateRecoilUI();
-                cross.classList.remove('active', 'locked', 'snap');
+                return;
             }
-            animationFrameId = requestAnimationFrame(updateLoop);
-            return;
-        }
-
-        if (!aimingActive || currentTouchX === 0) {
-            applyRecoilCompensation(false);
-            cross.classList.remove('active', 'snap');
-            animationFrameId = requestAnimationFrame(updateLoop);
-            return;
-        }
-
-        // Active aiming
-        cross.classList.add('active');
-        const smoothed = smoothPosition(currentTouchX, currentTouchY);
-        const now = Date.now();
-        const isRapidNow = rapidFireFlag || firingActive || (now - lastTapTime < 100);
-        applyRecoilCompensation(isRapidNow);
-
-        const target = computeHeadPosition(smoothed.x, smoothed.y, recoilOffset);
-        updateCrosshair(target.x, target.y);
-
-        // Auto-super-lock on high precision
-        const perfectY = currentTouchY - CONFIG.HEAD_OFFSET_PX + recoilOffset;
-        const error = Math.abs(perfectY - crosshairY);
-        const precision = clamp(100 - error * 1.1, 80, 100);
-        if (precision > 95 && (firingActive || rapidFireFlag) && !superLockActive) {
-            activateSuperLock();
-        }
-
-        // Snap visual pulse
-        if (Math.abs(error) < 3 && snapCounter % 10 === 0) {
-            cross.classList.add('snap');
-            setTimeout(() => cross.classList.remove('snap'), 150);
-        }
-        snapCounter++;
-
-        animationFrameId = requestAnimationFrame(updateLoop);
-    }
-
-    // ---- Touch handlers ----
-    function handleTouchStart(e) {
-        e.preventDefault();
-        const touch = e.touches[0];
-        if (!touch) return;
-        currentTouchX = touch.clientX;
-        currentTouchY = touch.clientY;
-        aimingActive = true;
-        lastRawX = currentTouchX;
-        lastRawY = currentTouchY;
-        prevTouchX = currentTouchX;
-        prevTouchY = currentTouchY;
-
-        if (interactionCount === 0) {
-            if (!userData.firstActive) {
-                userData.firstActive = Date.now();
-                saveData();
+            if (isRapid || firingActive) {
+                recoilOffset = Math.min(CONFIG.MAX_RECOIL_COMP, recoilOffset + CONFIG.RECOIL_PER_SHOT);
+            } else {
+                recoilOffset *= CONFIG.RECOIL_DECAY_FACTOR;
+                if (recoilOffset < 0.2) recoilOffset = 0;
             }
-            updateReferralUI();
-        }
-        interactionCount++;
-
-        if (navigator.vibrate) navigator.vibrate(8);
-
-        const now = Date.now();
-        const delta = now - lastTapTime;
-        if (delta < CONFIG.FIRING_WINDOW_MS) {
-            rapidFireFlag = true;
-            firingActive = true;
-            recoilOffset += CONFIG.RECOIL_PER_SHOT * 1.5;
-            tapSequenceCount++;
-            if (tapSequenceCount >= 3) {
-                activateSuperLock();
-                recoilOffset = Math.min(CONFIG.MAX_RECOIL_COMP, recoilOffset + 35);
-                tapSequenceCount = 0;
-            }
-        } else {
-            rapidFireFlag = false;
-            firingActive = false;
-            tapSequenceCount = 1;
-        }
-        lastTapTime = now;
-
-        // INSTANT SNAP on touch start
-        const snapPos = computeHeadPosition(currentTouchX, currentTouchY, recoilOffset);
-        updateCrosshair(snapPos.x, snapPos.y);
-        cross.classList.add('snap');
-        setTimeout(() => cross.classList.remove('snap'), 200);
-    }
-
-    function handleTouchMove(e) {
-        e.preventDefault();
-        if (!aimingActive) return;
-        const touch = e.touches[0];
-        if (!touch) return;
-        currentTouchX = touch.clientX;
-        currentTouchY = touch.clientY;
-    }
-
-    function handleTouchEnd(e) {
-        e.preventDefault();
-        aimingActive = false;
-        setTimeout(() => {
-            if (!aimingActive) {
-                firingActive = false;
-                rapidFireFlag = false;
-                tapSequenceCount = 0;
-            }
-        }, 100);
-        lastRawX = crosshairX;
-        lastRawY = crosshairY;
-    }
-
-    // ---- Toggle system ----
-    function toggleSystem() {
-        systemOn = !systemOn;
-        if (systemOn) {
-            toggle.classList.add('on');
-            panel.classList.add('active');
-            statusBadge.className = 'status-badge on';
-            statusText.textContent = 'On';
-            crosshairX = window.innerWidth / 2;
-            crosshairY = window.innerHeight / 2;
-            updateCrosshair(crosshairX, crosshairY);
-            showProofTicker('⚡ HEAD LOCK ACTIVE · SNAP ENGAGED');
-        } else {
-            toggle.classList.remove('on');
-            panel.classList.remove('active');
-            statusBadge.className = 'status-badge';
-            statusText.textContent = 'Off';
-            cross.classList.remove('locked', 'active', 'snap');
-            recoilOffset = 0;
             updateRecoilUI();
-            showProofTicker('⏸ HEAD LOCK PAUSED');
         }
-    }
 
-    // ---- Referral UI ----
-    function updateReferralUI() {
-        usernameSpan.textContent = userData.username || 'Not set';
-        usernameInput.value = userData.username || '';
-        if (userData.username) {
-            refLinkText.textContent = `https://dpin5000.page/ref/${encodeURIComponent(userData.username)}`;
-        } else {
-            refLinkText.textContent = 'Set username to get referral link';
+        function activateSuperLock() {
+            if (superLockActive) return;
+            superLockActive = true;
+            recoilOffset = Math.min(CONFIG.MAX_RECOIL_COMP, recoilOffset + CONFIG.SUPER_LOCK_BOOST);
+            cross.classList.add('locked');
+            if (superLockTimer) clearTimeout(superLockTimer);
+            superLockTimer = setTimeout(() => {
+                superLockActive = false;
+                cross.classList.remove('locked');
+                panel.style.borderColor = '';
+                panel.style.boxShadow = '';
+            }, 5000);
+            panel.style.borderColor = 'rgba(255, 136, 0, 0.6)';
+            panel.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.7), 0 0 60px rgba(255, 136, 0, 0.2)';
+            showProofTicker('⚡ SUPER LOCK ACTIVATED');
         }
-        renderRefList();
 
-        const refs = userData.referred.length;
-        refCount.textContent = refs;
-        refBar.style.width = Math.min(100, (refs / 20) * 100) + '%';
+        // ---- Main loop ----
+        function updateLoop() {
+            if (!systemOn) {
+                if (!aimingActive) {
+                    recoilOffset *= CONFIG.RECOIL_DECAY_FACTOR * 1.04;
+                    if (recoilOffset < 0.5) recoilOffset = 0;
+                    updateRecoilUI();
+                    cross.classList.remove('active', 'locked', 'snap');
+                }
+                animationFrameId = requestAnimationFrame(updateLoop);
+                return;
+            }
 
-        let days = 0;
-        if (userData.firstActive) {
-            const diff = Date.now() - userData.firstActive;
-            days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            if (!aimingActive || currentTouchX === 0) {
+                applyRecoilCompensation(false);
+                cross.classList.remove('active', 'snap');
+                animationFrameId = requestAnimationFrame(updateLoop);
+                return;
+            }
+
+            // Active aiming
+            cross.classList.add('active');
+            const smoothed = smoothPosition(currentTouchX, currentTouchY);
+            const now = Date.now();
+            const isRapidNow = rapidFireFlag || firingActive || (now - lastTapTime < 100);
+            applyRecoilCompensation(isRapidNow);
+
+            const target = computeHeadPosition(smoothed.x, smoothed.y, recoilOffset);
+            updateCrosshair(target.x, target.y);
+
+            // Auto-super-lock on high precision
+            const perfectY = currentTouchY - CONFIG.HEAD_OFFSET_PX + recoilOffset;
+            const error = Math.abs(perfectY - crosshairY);
+            const precision = clamp(100 - error * 1.1, 80, 100);
+            if (precision > 95 && (firingActive || rapidFireFlag) && !superLockActive) {
+                activateSuperLock();
+            }
+
+            // Snap visual pulse
+            if (Math.abs(error) < 3 && snapCounter % 10 === 0) {
+                cross.classList.add('snap');
+                setTimeout(() => cross.classList.remove('snap'), 150);
+            }
+            snapCounter++;
+
+            animationFrameId = requestAnimationFrame(updateLoop);
         }
-        daysActive.textContent = days;
-        daysBar.style.width = Math.min(100, (days / 10) * 100) + '%';
 
-        const eligible = (refs >= 20 && days >= 10);
-        claimVipBtn.disabled = !eligible;
-        if (eligible) {
-            claimStatus.textContent = '✅ Ready to claim!';
-            claimStatus.style.color = '#0eff00';
-        } else {
-            claimStatus.textContent = `Need ${20 - refs} more refs & ${10 - days} more days`;
-            claimStatus.style.color = 'rgba(255,255,255,0.2)';
-        }
-    }
+        // ---- Touch handlers ----
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            if (!touch) return;
+            currentTouchX = touch.clientX;
+            currentTouchY = touch.clientY;
+            aimingActive = true;
+            lastRawX = currentTouchX;
+            lastRawY = currentTouchY;
+            prevTouchX = currentTouchX;
+            prevTouchY = currentTouchY;
 
-    function renderRefList() {
-        refList.innerHTML = '';
-        userData.referred.forEach((uname, index) => {
-            const tag = document.createElement('span');
-            tag.className = 'ref-tag';
-            tag.innerHTML = `${uname} <span class="remove" data-index="${index}">✕</span>`;
-            refList.appendChild(tag);
-        });
-        document.querySelectorAll('.ref-tag .remove').forEach(el => {
-            el.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const idx = parseInt(this.dataset.index);
-                userData.referred.splice(idx, 1);
-                saveData();
+            if (interactionCount === 0) {
+                if (!userData.firstActive) {
+                    userData.firstActive = Date.now();
+                    saveData();
+                }
                 updateReferralUI();
+            }
+            interactionCount++;
+
+            if (navigator.vibrate) navigator.vibrate(8);
+
+            const now = Date.now();
+            const delta = now - lastTapTime;
+            if (delta < CONFIG.FIRING_WINDOW_MS) {
+                rapidFireFlag = true;
+                firingActive = true;
+                recoilOffset += CONFIG.RECOIL_PER_SHOT * 1.5;
+                tapSequenceCount++;
+                if (tapSequenceCount >= 3) {
+                    activateSuperLock();
+                    recoilOffset = Math.min(CONFIG.MAX_RECOIL_COMP, recoilOffset + 35);
+                    tapSequenceCount = 0;
+                }
+            } else {
+                rapidFireFlag = false;
+                firingActive = false;
+                tapSequenceCount = 1;
+            }
+            lastTapTime = now;
+
+            // INSTANT SNAP on touch start
+            const snapPos = computeHeadPosition(currentTouchX, currentTouchY, recoilOffset);
+            updateCrosshair(snapPos.x, snapPos.y);
+            cross.classList.add('snap');
+            setTimeout(() => cross.classList.remove('snap'), 200);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!aimingActive) return;
+            const touch = e.touches[0];
+            if (!touch) return;
+            currentTouchX = touch.clientX;
+            currentTouchY = touch.clientY;
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            aimingActive = false;
+            setTimeout(() => {
+                if (!aimingActive) {
+                    firingActive = false;
+                    rapidFireFlag = false;
+                    tapSequenceCount = 0;
+                }
+            }, 100);
+            lastRawX = crosshairX;
+            lastRawY = crosshairY;
+        }
+
+        // ---- Toggle system ----
+        function toggleSystem() {
+            systemOn = !systemOn;
+            if (systemOn) {
+                toggle.classList.add('on');
+                panel.classList.add('active');
+                statusBadge.className = 'status-badge on';
+                statusText.textContent = 'On';
+                crosshairX = window.innerWidth / 2;
+                crosshairY = window.innerHeight / 2;
+                updateCrosshair(crosshairX, crosshairY);
+                showProofTicker('⚡ HEAD LOCK ACTIVE · SNAP ENGAGED');
+            } else {
+                toggle.classList.remove('on');
+                panel.classList.remove('active');
+                statusBadge.className = 'status-badge';
+                statusText.textContent = 'Off';
+                cross.classList.remove('locked', 'active', 'snap');
+                recoilOffset = 0;
+                updateRecoilUI();
+                showProofTicker('⏸ HEAD LOCK PAUSED');
+            }
+        }
+
+        // ---- Referral UI ----
+        function updateReferralUI() {
+            usernameSpan.textContent = userData.username || 'Not set';
+            usernameInput.value = userData.username || '';
+            if (userData.username) {
+                refLinkText.textContent = `https://dpin5000.page/ref/${encodeURIComponent(userData.username)}`;
+            } else {
+                refLinkText.textContent = 'Set username to get referral link';
+            }
+            renderRefList();
+
+            const refs = userData.referred.length;
+            refCount.textContent = refs;
+            refBar.style.width = Math.min(100, (refs / 20) * 100) + '%';
+
+            let days = 0;
+            if (userData.firstActive) {
+                const diff = Date.now() - userData.firstActive;
+                days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            }
+            daysActive.textContent = days;
+            daysBar.style.width = Math.min(100, (days / 10) * 100) + '%';
+
+            const eligible = (refs >= 20 && days >= 10);
+            claimVipBtn.disabled = !eligible;
+            if (eligible) {
+                claimStatus.textContent = '✅ Ready to claim!';
+                claimStatus.style.color = '#0eff00';
+            } else {
+                claimStatus.textContent = `Need ${20 - refs} more refs & ${10 - days} more days`;
+                claimStatus.style.color = 'rgba(255,255,255,0.2)';
+            }
+        }
+
+        function renderRefList() {
+            refList.innerHTML = '';
+            userData.referred.forEach((uname, index) => {
+                const tag = document.createElement('span');
+                tag.className = 'ref-tag';
+                tag.innerHTML = `${uname} <span class="remove" data-index="${index}">✕</span>`;
+                refList.appendChild(tag);
+            });
+            document.querySelectorAll('.ref-tag .remove').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const idx = parseInt(this.dataset.index);
+                    userData.referred.splice(idx, 1);
+                    saveData();
+                    updateReferralUI();
+                });
+            });
+        }
+
+        // ---- Referral events ----
+        setUsernameBtn.addEventListener('click', function() {
+            const val = usernameInput.value.trim();
+            if (val.length < 3) {
+                showProofTicker('⚠️ Username must be at least 3 characters');
+                return;
+            }
+            userData.username = val;
+            saveData();
+            updateReferralUI();
+            showProofTicker(`✅ Username set to ${val}`);
+        });
+
+        addReferredBtn.addEventListener('click', function() {
+            const val = referredInput.value.trim();
+            if (!val) return;
+            if (val === userData.username) {
+                showProofTicker('⚠️ Cannot refer yourself');
+                return;
+            }
+            if (userData.referred.includes(val)) {
+                showProofTicker('⚠️ Already added');
+                return;
+            }
+            userData.referred.push(val);
+            saveData();
+            updateReferralUI();
+            referredInput.value = '';
+            showProofTicker(`✅ ${val} added as referral`);
+        });
+
+        copyRefLink.addEventListener('click', function() {
+            const link = refLinkText.textContent;
+            if (link.startsWith('Set username')) {
+                showProofTicker('⚠️ Set username first');
+                return;
+            }
+            navigator.clipboard.writeText(link).then(() => {
+                showProofTicker('📋 Referral link copied!');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = link;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showProofTicker('📋 Referral link copied!');
             });
         });
-    }
 
-    // ---- Referral events ----
-    setUsernameBtn.addEventListener('click', function() {
-        const val = usernameInput.value.trim();
-        if (val.length < 3) {
-            showProofTicker('⚠️ Username must be at least 3 characters');
-            return;
-        }
-        userData.username = val;
-        saveData();
-        updateReferralUI();
-        showProofTicker(`✅ Username set to ${val}`);
-    });
-
-    addReferredBtn.addEventListener('click', function() {
-        const val = referredInput.value.trim();
-        if (!val) return;
-        if (val === userData.username) {
-            showProofTicker('⚠️ Cannot refer yourself');
-            return;
-        }
-        if (userData.referred.includes(val)) {
-            showProofTicker('⚠️ Already added');
-            return;
-        }
-        userData.referred.push(val);
-        saveData();
-        updateReferralUI();
-        referredInput.value = '';
-        showProofTicker(`✅ ${val} added as referral`);
-    });
-
-    copyRefLink.addEventListener('click', function() {
-        const link = refLinkText.textContent;
-        if (link.startsWith('Set username')) {
-            showProofTicker('⚠️ Set username first');
-            return;
-        }
-        navigator.clipboard.writeText(link).then(() => {
-            showProofTicker('📋 Referral link copied!');
-        }).catch(() => {
-            const textarea = document.createElement('textarea');
-            textarea.value = link;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showProofTicker('📋 Referral link copied!');
+        let refOpen = false;
+        refToggle.addEventListener('click', function() {
+            refOpen = !refOpen;
+            refBody.classList.toggle('open', refOpen);
+            refArrow.classList.toggle('open', refOpen);
         });
-    });
 
-    let refOpen = false;
-    refToggle.addEventListener('click', function() {
-        refOpen = !refOpen;
-        refBody.classList.toggle('open', refOpen);
-        refArrow.classList.toggle('open', refOpen);
-    });
-
-    claimVipBtn.addEventListener('click', function() {
-        const refs = userData.referred;
-        if (refs.length < 20) {
-            showProofTicker('⚠️ Need 20 referrals');
-            return;
-        }
-        const days = Math.floor((Date.now() - userData.firstActive) / (1000*60*60*24));
-        if (days < 10) {
-            showProofTicker('⚠️ Need 10 active days');
-            return;
-        }
-        const subject = encodeURIComponent('VIP Claim - Referral Program');
-        const body = encodeURIComponent(
-            `Hi,\n\nI have completed the referral program.\n\nMy username: ${userData.username}\nActive days: ${days}\nReferred users (${refs.length}):\n${refs.join('\n')}\n\nPlease activate my VIP for 3 months.\n\nThanks!`
-        );
-        window.location.href = `mailto:easyaim887@gmail.com?subject=${subject}&body=${body}`;
-        showProofTicker('📨 Opening email to claim VIP...');
-    });
-
-    // ---- Mouse fallback ----
-    magnet.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        const fake = { touches: [{ clientX: e.clientX, clientY: e.clientY }] };
-        handleTouchStart(fake);
-        const onMove = (me) => {
-            me.preventDefault();
-            const fakeMove = { touches: [{ clientX: me.clientX, clientY: me.clientY }] };
-            handleTouchMove(fakeMove);
-        };
-        const onUp = () => {
-            handleTouchEnd(new Event('touchend'));
-            window.removeEventListener('mousemove', onMove);
-            window.removeEventListener('mouseup', onUp);
-        };
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onUp);
-    });
-
-    // ---- Proof ticker ----
-    const proofMessages = [
-        '🔥 30+ PLAYERS USING dpin5000 TODAY',
-        '👑 VIP ACCESS UNLOCKS SUPER LOCK',
-        '⚡ HEAD LOCK ACTIVE · 99% ACCURACY',
-        '🎯 +47 HEADSHOTS LAST HOUR',
-        '💎 PRO PLAN · ₹1,500 · 3 DEVICES',
-    ];
-    let proofIndex = 0;
-
-    function showProofTicker(msg) {
-        const ticker = document.getElementById('proof-ticker');
-        ticker.textContent = msg;
-        ticker.classList.add('show');
-        setTimeout(() => ticker.classList.remove('show'), 3500);
-    }
-
-    setInterval(() => {
-        if (interactionCount > 5) {
-            showProofTicker(proofMessages[proofIndex % proofMessages.length]);
-            proofIndex++;
-        }
-    }, 8000);
-
-    // ---- VIP Modal ----
-    window.openVipModal = function() {
-        document.getElementById('vip-modal').classList.add('show');
-        if (navigator.vibrate) navigator.vibrate([20, 50, 20]);
-    };
-    window.closeVipModal = function() {
-        document.getElementById('vip-modal').classList.remove('show');
-    };
-    window.choosePlan = function(plan) {
-        const subject = encodeURIComponent(`VIP ${plan} - dpin5000`);
-        const body = encodeURIComponent(`Hi,\n\nI want to upgrade to ${plan}.\n\nMy device:\nMy UPI ID for payment:\n\nThanks!`);
-        window.location.href = `mailto:easyaim887@gmail.com?subject=${subject}&body=${body}`;
-    };
-
-    // ---- Init ----
-    function init() {
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-        updateCrosshair(centerX, centerY);
-        updateHeadOffset();
-        try {
-            document.documentElement.requestFullscreen?.();
-            if (screen.orientation?.lock) screen.orientation.lock('landscape-primary');
-        } catch(e) {}
-        if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        animationFrameId = requestAnimationFrame(updateLoop);
-        updateReferralUI();
-        setTimeout(() => showProofTicker('🎯 HEAD SNAP ACTIVE · DRAG TO AIM'), 2000);
-    }
-
-    // ---- Events ----
-    magnet.addEventListener('touchstart', handleTouchStart, { passive: false });
-    magnet.addEventListener('touchmove', handleTouchMove, { passive: false });
-    magnet.addEventListener('touchend', handleTouchEnd);
-    magnet.addEventListener('touchcancel', handleTouchEnd);
-    toggle.addEventListener('click', toggleSystem);
-    toggle.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); toggleSystem(); });
-
-    document.addEventListener('contextmenu', e => e.preventDefault());
-
-    window.addEventListener('resize', () => {
-        updateHeadOffset();
-        if (!aimingActive) {
-            const cx = clamp(crosshairX, 20, window.innerWidth - 20);
-            const cy = clamp(crosshairY, 20, window.innerHeight - 20);
-            updateCrosshair(cx, cy);
-        }
-    });
-
-    // Rapid-fire monitor
-    setInterval(() => {
-        if (systemOn && aimingActive && Date.now() - lastTapTime < 110) {
-            if (!firingActive) firingActive = true;
-            rapidFireFlag = true;
-        } else {
-            if (!aimingActive) {
-                firingActive = false;
-                rapidFireFlag = false;
-            } else if (Date.now() - lastTapTime > 200) {
-                firingActive = false;
-                rapidFireFlag = false;
+        claimVipBtn.addEventListener('click', function() {
+            const refs = userData.referred;
+            if (refs.length < 20) {
+                showProofTicker('⚠️ Need 20 referrals');
+                return;
             }
-        }
-    }, 60);
+            const days = Math.floor((Date.now() - userData.firstActive) / (1000 * 60 * 60 * 24));
+            if (days < 10) {
+                showProofTicker('⚠️ Need 10 active days');
+                return;
+            }
+            const subject = encodeURIComponent('VIP Claim - Referral Program');
+            const body = encodeURIComponent(
+                `Hi,\n\nI have completed the referral program.\n\nMy username: ${userData.username}\nActive days: ${days}\nReferred users (${refs.length}):\n${refs.join('\n')}\n\nPlease activate my VIP for 3 months.\n\nThanks!`
+            );
+            window.location.href = `mailto:easyaim887@gmail.com?subject=${subject}&body=${body}`;
+            showProofTicker('📨 Opening email to claim VIP...');
+        });
 
-    init();
-    console.log('🎯 HEAD LOCK PRO · aggressive snap · crosshair visible');
-})();
+        // ---- Mouse fallback ----
+        magnet.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const fake = { touches: [{ clientX: e.clientX, clientY: e.clientY }] };
+            handleTouchStart(fake);
+            const onMove = (me) => {
+                me.preventDefault();
+                const fakeMove = { touches: [{ clientX: me.clientX, clientY: me.clientY }] };
+                handleTouchMove(fakeMove);
+            };
+            const onUp = () => {
+                handleTouchEnd(new Event('touchend'));
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onUp);
+            };
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+        });
+
+        // ---- Proof ticker ----
+        const proofMessages = [
+            '🔥 30+ PLAYERS USING dpin5000 TODAY',
+            '👑 VIP ACCESS UNLOCKS SUPER LOCK',
+            '⚡ HEAD LOCK ACTIVE · 99% ACCURACY',
+            '🎯 +47 HEADSHOTS LAST HOUR',
+            '💎 PRO PLAN · ₹1,500 · 3 DEVICES',
+        ];
+        let proofIndex = 0;
+
+        function showProofTicker(msg) {
+            const ticker = document.getElementById('proof-ticker');
+            ticker.textContent = msg;
+            ticker.classList.add('show');
+            setTimeout(() => ticker.classList.remove('show'), 3500);
+        }
+
+        setInterval(() => {
+            if (interactionCount > 5) {
+                showProofTicker(proofMessages[proofIndex % proofMessages.length]);
+                proofIndex++;
+            }
+        }, 8000);
+
+        // ---- VIP Modal ----
+        window.openVipModal = function() {
+            document.getElementById('vip-modal').classList.add('show');
+            if (navigator.vibrate) navigator.vibrate([20, 50, 20]);
+        };
+        window.closeVipModal = function() {
+            document.getElementById('vip-modal').classList.remove('show');
+        };
+        window.choosePlan = function(plan) {
+            const subject = encodeURIComponent(`VIP ${plan} - dpin5000`);
+            const body = encodeURIComponent(`Hi,\n\nI want to upgrade to ${plan}.\n\nMy device:\nMy UPI ID for payment:\n\nThanks!`);
+            window.location.href = `mailto:easyaim887@gmail.com?subject=${subject}&body=${body}`;
+        };
+
+        // ---- Init ----
+        function init() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            updateCrosshair(centerX, centerY);
+            updateHeadOffset();
+            try {
+                document.documentElement.requestFullscreen?.();
+                if (screen.orientation?.lock) screen.orientation.lock('landscape-primary');
+            } catch (e) {}
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(updateLoop);
+            updateReferralUI();
+            setTimeout(() => showProofTicker('🎯 HEAD SNAP ACTIVE · DRAG TO AIM'), 2000);
+        }
+
+        // ---- Events ----
+        magnet.addEventListener('touchstart', handleTouchStart, { passive: false });
+        magnet.addEventListener('touchmove', handleTouchMove, { passive: false });
+        magnet.addEventListener('touchend', handleTouchEnd);
+        magnet.addEventListener('touchcancel', handleTouchEnd);
+        toggle.addEventListener('click', toggleSystem);
+        toggle.addEventListener('touchstart', (e) => { e.preventDefault();
+            e.stopPropagation();
+            toggleSystem(); });
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        window.addEventListener('resize', () => {
+            updateHeadOffset();
+            if (!aimingActive) {
+                const cx = clamp(crosshairX, 20, window.innerWidth - 20);
+                const cy = clamp(crosshairY, 20, window.innerHeight - 20);
+                updateCrosshair(cx, cy);
+            }
+        });
+
+        // Rapid-fire monitor
+        setInterval(() => {
+            if (systemOn && aimingActive && Date.now() - lastTapTime < 110) {
+                if (!firingActive) firingActive = true;
+                rapidFireFlag = true;
+            } else {
+                if (!aimingActive) {
+                    firingActive = false;
+                    rapidFireFlag = false;
+                } else if (Date.now() - lastTapTime > 200) {
+                    firingActive = false;
+                    rapidFireFlag = false;
+                }
+            }
+        }, 60);
+
+        init();
+        console.log('🎯 HEAD LOCK PRO · aggressive snap · crosshair visible');
+    })();
 </script>
 </body>
 </html>
